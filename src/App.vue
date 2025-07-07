@@ -76,7 +76,7 @@ export default {
           this.products.sort((a, b) => a.title.localeCompare(b.title));
         } else if (this.selectedOptions === 'title-desc') {
           this.products.sort((a, b) => b.title.localeCompare(a.title));
-        } else if (this.selectedOptions === 'default' && this.selectedCategories.length === 0) {
+        } else if (this.selectedOptions === 'default' && this.selectedCategories.length === 0 && !this.searchQuery) {
           this.products = [...this.originalProducts];
         }
         this.currentPage = 1;
