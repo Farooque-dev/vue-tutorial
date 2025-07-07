@@ -5,10 +5,8 @@
 }
 
 .app-container {
-    padding-left: 89px;
-    /* padding-right: 433px; */
-    padding-bottom: 902px;
-    /* width: 100%; */
+  padding-left: 89px;
+  padding-bottom: 902px;
 }
 
 .navbar-container {
@@ -122,11 +120,10 @@ select {
 }
 
 #app {
-    /* max-width: 1800px; */
-    padding-bottom: 100px;
-    padding-left: 17px;
-    padding-right: 17px;
-    margin: 0;
+  padding-bottom: 100px;
+  padding-left: 17px;
+  padding-right: 17px;
+  margin: 0;
 }
 
 .total-products {
@@ -341,7 +338,6 @@ input:checked ~ .checkmark .checkmark-inner {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    transition: background 0.5s;
   }
 
   .mobile-sort-popup {
