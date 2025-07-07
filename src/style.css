@@ -1,0 +1,613 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  padding-left: 130px;
+  padding-right: 433px;
+  padding-bottom: 815px;
+}
+
+.navbar-container {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+}
+
+input {
+  width: 300px;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0px 0px 4px 0px grey;
+}
+
+.sort-label-mobile {
+  display: none;
+}
+.sort-label-desktop {
+  display: inline;
+}
+
+select {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+}
+
+.image-wrapper-class {
+  width: 267px;
+  height: 357px;
+  overflow: hidden;
+  display: block;
+}
+
+.image-container-1 {
+  height: inherit;
+  width: inherit;
+}
+
+.image-container-2 {
+  display: none;
+}
+
+.image-wrapper-class:hover .image-container-2 {
+  display: block;
+  height: inherit;
+  width: inherit;
+}
+
+.image-wrapper-class:hover .image-container-1 {
+  display: none;
+}
+
+.images-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  list-style: none;
+  width: 100%;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
+}
+
+.main-content {
+  margin-top: 50px;
+  display: flex;
+  padding-left: 13px;
+}
+
+.loading-container {
+  margin-top: 0;
+  padding-left: 20px;
+}
+
+.left-content {
+  width: auto;
+}
+
+.right-content {
+  padding-left: 20px;
+}
+
+.filter-list {
+  list-style: none;
+  border-bottom: 1px solid black;
+  padding-bottom: 10px;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+.filter-item {
+  justify-content: space-between;
+  display: flex;
+  width: 280px;
+  border-top: 1px solid;
+  font-size: 0.8em;
+  letter-spacing: 0.3em;
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+
+.filter-sort-container {
+  display: none;
+}
+
+#app {
+  max-width: 1800px;
+  padding-bottom: 100px;
+  padding-left: 17px;
+  padding-right: 17px;
+}
+
+.total-products {
+  display: none;
+}
+
+#category {
+  padding-top: 5px;
+  background-color: transparent;
+  border: none;
+  font-size: 1.1em;
+  cursor: pointer;
+  letter-spacing: 0.3em;
+  width: 100%;
+  text-align: left;
+  font-family: "mundo sans", sans-serif;
+}
+
+.filter-sort-container {
+  display: none;
+}
+
+.filter-sidebar {
+  display: none;
+}
+
+.filter-list-items {
+  display: flex;
+  list-style: none;
+  cursor: pointer;
+  font-family: "Space Mono";
+  font-size: 1.1em;
+  line-height: 1.4;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.filter-name {
+  text-transform: capitalize;
+  padding-left: 30px;
+}
+
+.filter-name-selected {
+  font-weight: 700;
+}
+
+.filter-list-items:hover {
+  text-decoration: underline;
+}
+
+.top-right-container {
+  display: flex;
+  justify-content: space-between;
+  width: 1400px;
+}
+
+.sort-by-container {
+  background-color: white;
+  padding-right: 272px;
+}
+
+#sort-by {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 0;
+  height: 44px;
+  width: 249.16px;
+  font-family: "Mundo Sans";
+  font-size: medium;
+  cursor: pointer;
+}
+
+.products-count {
+  margin-bottom: 15px;
+}
+
+.product-title,
+.product-price {
+  text-align: center;
+  font-family: Space Mono;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  color: #494949;
+}
+
+.bottom-container {
+  display: none;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 100px;
+  cursor: pointer;
+}
+
+.active-page {
+  opacity: 0.3;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.input-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  border: 1px solid;
+  height: 16px;
+  width: 16px;
+  padding: 2px;
+  box-sizing: border-box;
+  display: inline-block;
+  position: absolute;
+}
+
+.checkmark-inner {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  margin-bottom: 7px;
+  margin-right: 2px;
+}
+
+input:checked ~ .checkmark .checkmark-inner {
+  background-color: #494949;
+}
+
+.page-item {
+  padding: 8px 12px;
+  font-family: "Mundo Sans";
+}
+
+.scroll-to-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 60px;
+  height: 60px;
+  color: black;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+#product-thumbnail {
+  background: transparent;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  input {
+    width: 100%;
+  }
+  .filter-sort-container {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .navbar-container {
+    display: block;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .filter-container {
+    display: flex;
+    width: 50%;
+  }
+
+  .active-filter {
+    background-color: #494949 !important;
+    color: white;
+  }
+
+  .sort-label-mobile {
+    display: inline;
+  }
+  .sort-label-desktop {
+    display: none;
+  }
+
+  .mobile-sort-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transition: background 0.5s;
+  }
+
+  .mobile-sort-popup {
+    background: #fff;
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mobile-sort-title {
+    height: 64px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 24px;
+    padding-right: 24px;
+    width: 100%;
+    text-align: center;
+    font-family: "Space Mono";
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    font-size: smaller;
+    font-weight: 400;
+    line-height: 44px;
+  }
+
+  .mobile-sort-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+    text-align: center;
+    list-style: none;
+  }
+
+  .mobile-sort-item-name {
+    padding: 10px 0;
+    font-size: 13px;
+    font-family: "Mundo Sans";
+    margin-bottom: 0.25em;
+  }
+
+  .selected-sort-option {
+    padding: 10px 0;
+    color: white;
+    background-color: #494949;
+    font-family: "Mundo Sans";
+    font-size: 13px;
+  }
+
+  .filter-icon {
+    margin-left: 18px;
+    margin-right: 10px;
+    padding-bottom: 8px;
+    stroke-width: 2px;
+    margin-bottom: 4px;
+    fill: #ffffff;
+    stroke: black;
+  }
+
+  .active-filter-icon {
+    fill: #494949 !important;
+    stroke: white;
+  }
+
+  .total-products {
+    display: block;
+    text-align: center;
+    font-family: "Space Mono";
+    font-size: small;
+    padding: 5px 0;
+  }
+
+  .filter-button {
+    text-align: left;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    background-color: white;
+    border: 1px solid #494949;
+    cursor: pointer;
+    font-size: 16px;
+    letter-spacing: normal;
+    font-family: "Mundo Sans", sans-serif;
+    padding-top: 12px;
+    padding-right: 70px;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+  }
+
+  .filter-sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 24px 16px 16px 16px;
+    overflow-y: auto;
+  }
+
+  .filter-sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 16px;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .sort-container {
+    position: relative;
+    margin-left: 15px;
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+  }
+
+  .close-button {
+    background-color: white;
+    border: none;
+  }
+
+  .sort-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 44px;
+    background-color: white;
+    border: 1px solid #494949;
+    cursor: pointer;
+    font-size: 16px;
+    letter-spacing: normal;
+    justify-content: space-between;
+    padding-left: 10px;
+    font-family: "Mundo Sans", sans-serif;
+  }
+
+  .bottom-container {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    background: white;
+    padding: 10px 0;
+  }
+
+  .bottom-left-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .left-content {
+    display: none;
+  }
+
+  .right-content {
+    padding-left: 0;
+  }
+
+  .image-wrapper-class {
+    width: 100%;
+    object-fit: cover;
+    height: auto;
+  }
+
+  .images-list-items {
+    width: 50%;
+    padding: 0;
+  }
+
+  .product-title,
+  .product-price {
+    text-align: center;
+    font-family: Space Mono;
+    line-height: 1.5;
+    letter-spacing: 0.025em;
+    color: #494949;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .sort-by-container {
+    padding-left: 0;
+    margin-top: 10px;
+  }
+
+  .images-list {
+    display: flex;
+    gap: 0;
+  }
+
+  .app-container {
+    padding-right: 0;
+    padding-left: 0;
+    padding-bottom: 0;
+  }
+
+  .main-content {
+    margin-top: 0;
+    padding-left: 0;
+  }
+
+  .top-right-container {
+    display: none;
+  }
+
+  .image-container-1 {
+    width: 100%;
+    height: auto;
+  }
+
+  .sort-dropdown {
+    margin-top: 4px;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #494949;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    width: 100%;
+  }
+
+  .sort-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-left: 8px;
+  }
+
+  .scroll-to-top {
+    display: none;
+  }
+
+  .sort-dropdown ul li {
+    color: #000;
+    font-size: medium;
+    font-family: "Mundo Sans";
+  }
+}
