@@ -120,7 +120,11 @@ select {
 }
 
 #app {
+<<<<<<< HEAD
   /* padding-bottom: 100px; */
+=======
+  padding-bottom: 100px;
+>>>>>>> vue-prod
   padding-left: 17px;
   padding-right: 17px;
   margin: 0;
@@ -338,7 +342,6 @@ input:checked ~ .checkmark .checkmark-inner {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    transition: background 0.5s;
   }
 
   .mobile-sort-popup {

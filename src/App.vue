@@ -280,7 +280,7 @@ export default {
       </div>
     </div>
     <div class="total-products">
-      <span>{{ this.products.length }} products</span>
+      <span>{{ this.products.length > 1 ? this.products.length +' products' : this.products.length + ' product' }}</span>
     </div>
     <div v-if="showFilterSidebar" class="sidebar-overlay" @click="showFilterSidebar = false">
     </div>
