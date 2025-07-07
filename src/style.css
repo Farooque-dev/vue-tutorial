@@ -120,11 +120,7 @@ select {
 }
 
 #app {
-<<<<<<< HEAD
-  /* padding-bottom: 100px; */
-=======
   padding-bottom: 100px;
->>>>>>> vue-prod
   padding-left: 17px;
   padding-right: 17px;
   margin: 0;
