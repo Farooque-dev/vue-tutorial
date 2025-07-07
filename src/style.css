@@ -142,6 +142,21 @@ select {
   font-family: "mundo sans", sans-serif;
 }
 
+.isReset {
+  display: block;
+  font-weight: bold;
+  background-color: transparent;
+  border: none;
+  font-size: 1.1em;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: "mundo sans", sans-serif;
+  color: #494949;
+  text-transform: capitalize;
+  padding-left: 20px;
+}
+
 .filter-sort-container {
   display: none;
 }

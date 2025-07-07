@@ -1,4 +1,5 @@
 <script>
+import ProductCard from './ProductCard.vue';
 export default {
   data() {
     return {
@@ -26,9 +27,13 @@ export default {
       ]
     }
   },
+  components: {
+    ProductCard
+  },
   methods: {
     async fetchData(page) {
       try {
+        
         const response = await fetch(`https://dummyjson.com/products?limit=0`);
         if (!response) {
           throw new Error('No response found');
@@ -173,6 +178,15 @@ export default {
       this.debounceTimer = setTimeout(() => {
         this.searchProducts(query);
       }, 400);
+    },
+    async resetFilters(){
+      this.selectedCategories = [];
+      await this.fetchData();
+      if(this.selectedOptions === 'default') {
+        this.products = [...this.originalProducts];
+      } else {
+        this.sortProducts();
+      }
     }
   },
 
@@ -322,6 +336,7 @@ export default {
         <ul class="filter-list">
           <div class="filter-item" style="border-top: none;" @click="getCategoriesList">
             <button id="category">CATEGORY</button>
+            <button v-show="this.selectedCategories.length > 0" @click.stop="resetFilters" :class="{ 'isReset': this.selectedCategories.length > 0}">Reset All</button>
             <span class="svg-drop-down-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="12px" height="12px" viewBox="0 0 24 16" fill="none"
                 :class="{ 'rotated': showCategories }">
@@ -363,7 +378,7 @@ export default {
             </select>
           </div>
         </div>
-        <ul class="images-list">
+        <!-- <ul class="images-list">
           <li v-for="product in paginatedProducts" :key="product.id" class="images-list-items">
             <a :href="product.thumbnail" target="_blank" id="product-thumbnail">
               <div class="image-wrapper-class">
@@ -375,7 +390,8 @@ export default {
               <p class="product-price">{{ `$${product.price}` }}</p>
             </a>
           </li>
-        </ul>
+        </ul> -->
+      <ProductCard :products="paginatedProducts"/>
       </div>
     </div>
     <div v-else class="loading-container">
