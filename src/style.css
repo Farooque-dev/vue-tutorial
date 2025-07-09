@@ -240,6 +240,7 @@ select {
   justify-content: center;
   margin-top: 100px;
   cursor: pointer;
+  flex-wrap: wrap;
 }
 
 .active-page {
