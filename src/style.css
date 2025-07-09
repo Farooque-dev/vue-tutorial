@@ -401,6 +401,7 @@ input:checked ~ .checkmark .checkmark-inner {
     font-size: smaller;
     font-weight: 400;
     line-height: 44px;
+    border-bottom: 1px solid #dddddd;
   }
 
   .mobile-sort-list {
