@@ -8,13 +8,13 @@ export default {
       searchQuery: '',
       selectedOptions: 'default',
       totalProducts: 0,
-      productsPerPage: 32,
+      productsPerPage: 16,
       isVisible: false,
       categories: [],
       showCategories: false,
       showFilterSidebar: false,
       debounceTimer: null,
-      selectedCategories: [],
+      selectedCategory: '',
       categoryCounts: {},
       currentPage: 1,
       showMobileSortPopup: false,
@@ -33,62 +33,112 @@ export default {
   methods: {
     async fetchData(page) {
       try {
-        
-        const response = await fetch(`https://dummyjson.com/products?limit=0`);
-        if (!response) {
-          throw new Error('No response found');
+        this.searchQuery = '';
+        const skip = this.skipProducts(page || 1);
+
+        if (!this.selectedCategory && this.selectedOptions === 'default') {
+          const response = await fetch(`https://dummyjson.com/products?limit=${this.productsPerPage}&skip=${skip}`);
+
+          if (!response) {
+            throw new Error('No response found');
+          }
+
+          const result = await response.json();
+          this.products = result.products
+          this.totalProducts = result.total;
+          this.originalProducts = [...this.products];
+          return this.products;
+        } else if (this.selectedCategory) {
+          await this.sortProducts(this.selectedCategory, skip);
+          this.originalProducts = [...this.products];
+          return this.products;
+        } else {
+          const response = await fetch(`https://dummyjson.com/products?limit=${this.productsPerPage}&skip=${skip}`);
+          if (!response) throw new Error('No response found');
+          const result = await response.json();
+          this.products = result.products;
+          this.totalProducts = result.total;
+          this.originalProducts = [...this.products];
+          return this.products;
         }
-        const result = await response.json();
-        this.products = result.products
-        this.totalProducts = result.total;
-        console.log(result);
-        this.originalProducts = [...this.products];
       } catch (error) {
         console.error(error.message);
       }
     },
 
-    async searchProducts(query) {
-      this.selectedOptions = 'default';
-      this.selectedCategories = [];
+    async searchProducts(query, page = 1) {
+
       if (!query) {
+        this.currentPage = 1;
         await this.fetchData();
         return;
-      }
-      try {
-        const response = await fetch(`https://dummyjson.com/products/search?q=${query}&limit=0`);
-        if (!response) {
-          throw new Error('No response found.');
+      } else {
+        try {
+          this.selectedOptions = 'default';
+          this.selectedCategory = '';
+          const skip = this.skipProducts(page);
+          const response = await fetch(`https://dummyjson.com/products/search?q=${query}&limit=${this.productsPerPage}&skip=${skip}`);
+          if (!response) {
+            throw new Error('No response found.');
+          }
+          const result = await response.json();
+          this.products = result.products;
+          this.totalProducts = result.total;
+        } catch (error) {
+          console.error(error.message);
         }
+      }
+    },
+
+    async onSortChange() {
+      this.currentPage = 1;
+      const skip = this.skipProducts(this.currentPage);
+      await this.sortProducts(this.selectedCategory, skip, this.searchQuery);
+    },
+
+    async sortProducts(category, skip, search) {
+      console.log(`category: ${category}`);
+      console.log(`query: ${search}`);
+      this.currentPage = this.currentPage || 1;
+      skip = skip !== undefined ? skip : this.skipProducts(this.currentPage);
+
+      const baseURL = 'https://dummyjson.com/products';
+      const params = new URLSearchParams({
+        limit: this.productsPerPage,
+        skip
+      });
+
+      let url = baseURL;
+
+      if (category) {
+        url += `/category/${category}`;
+      } else if (search) {
+        url += `/search`;
+        params.set('q', search);
+      }
+
+      const [sortField, sortOrder] = this.selectedOptions.split('-');
+      if (sortField && sortField !== 'default') {
+        params.set('sortBy', sortField);
+        if (sortOrder) {
+          params.set('order', sortOrder);
+        }
+      }
+
+      const fullUrl = `${url}?${params.toString()}`;
+      console.log('Fetch URL:', fullUrl);
+
+      try {
+        const response = await fetch(fullUrl);
+        if (!response) throw new Error('No response found.');
         const result = await response.json();
         this.products = result.products;
-        this.currentPage = 1;
-
-        console.log(`query: ${query}`);
-        console.log(`result: ${result.products.length}`);
+        this.totalProducts = result.total;
       } catch (error) {
         console.error(error.message);
       }
-    },
-
-    sortProducts() {
-      try {
-        if (this.selectedOptions === 'price-asc') {
-          this.products.sort((a, b) => a.price - b.price);
-        } else if (this.selectedOptions === 'price-desc') {
-          this.products.sort((a, b) => b.price - a.price);
-        } else if (this.selectedOptions === 'title-asc') {
-          this.products.sort((a, b) => a.title.localeCompare(b.title));
-        } else if (this.selectedOptions === 'title-desc') {
-          this.products.sort((a, b) => b.title.localeCompare(a.title));
-        } else if (this.selectedOptions === 'default' && this.selectedCategories.length === 0 && !this.searchQuery) {
-          this.products = [...this.originalProducts];
-        }
-        this.currentPage = 1;
-      } catch (error) {
-        console.error(error.message);
-      }
-    },
+    }
+    ,
 
     scrollToTop() {
       window.scrollTo({
@@ -108,7 +158,6 @@ export default {
           throw new Error('No response found.');
         }
         const result = await response.json();
-        console.log(result);
         this.categories = result;
         this.showCategories = !this.showCategories;
         const counts = {};
@@ -123,9 +172,12 @@ export default {
       }
     },
 
-    async fetchProductsByCategory(category) {
+    async fetchProductsByCategory(category, skip) {
       try {
-        const response = await fetch(`https://dummyjson.com/products/category/${category}`);
+        const response = await fetch(`https://dummyjson.com/products/category/${category}?limit=${this.productsPerPage}&skip=${skip}`);
+        if (!response) {
+          throw new Error('No response found.');
+        }
         return response;
       } catch (error) {
         return null;
@@ -134,7 +186,7 @@ export default {
 
     async getProductsByCategoryTotal(category) {
       try {
-        const response = await this.fetchProductsByCategory(category);
+        const response = await this.fetchProductsByCategory(category, 0);
         if (!response) {
           throw new Error('No response found.');
         }
@@ -147,28 +199,25 @@ export default {
     },
 
     async onCategoryChange() {
-      if (this.selectedCategories.length === 0) {
-        await this.fetchData();
-      } else {
-        let allProducts = [];
-        let total = 0;
-        for (const cat of this.selectedCategories) {
-          const response = await this.fetchProductsByCategory(cat);
-          if (response.ok) {
-            const result = await response.json();
-            allProducts = allProducts.concat(result.products);
-            total += result.products.length;
-          }
-        }
-        this.products = allProducts;
-        this.totalProducts = total;
-      }
-      this.sortProducts();
+      this.currentPage = 1;
+      await this.fetchData();
     },
 
     async changePage(page) {
       this.currentPage = page;
       this.scrollToTop();
+      const skip = this.skipProducts(this.currentPage);
+      if (this.searchQuery) {
+        await this.sortProducts(this.selectedCategory, skip, this.searchQuery);
+      }
+      else if (this.selectedOptions !== 'default') {
+        await this.sortProducts(this.selectedCategory, skip, this.searchQuery);
+      } else if (this.selectedCategory) {
+        await this.sortProducts(this.selectedCategory, skip)
+      }
+      else {
+        await this.fetchData(page);
+      }
     },
 
     debouncedSearch(query) {
@@ -179,14 +228,18 @@ export default {
         this.searchProducts(query);
       }, 400);
     },
-    async resetFilters(){
-      this.selectedCategories = [];
+    async resetFilters() {
+      this.selectedCategory = '';
+      this.currentPage = 1;
       await this.fetchData();
-      if(this.selectedOptions === 'default') {
+      if (this.selectedOptions === 'default') {
         this.products = [...this.originalProducts];
       } else {
-        this.sortProducts();
+        this.sortProducts(this.selectedCategory, this.skipProducts(this.currentPage));
       }
+    },
+    skipProducts(page) {
+      return (page - 1) * this.productsPerPage;
     }
   },
 
@@ -229,14 +282,8 @@ export default {
       }
     },
 
-    paginatedProducts() {
-      const start = (this.currentPage - 1) * this.productsPerPage;
-      const end = start + this.productsPerPage;
-      return this.products.slice(start, end);
-    },
-
     pageCount() {
-      return Math.ceil(this.products.length / this.productsPerPage);
+      return Math.ceil(this.totalProducts / this.productsPerPage);
     }
   }
 }
@@ -254,16 +301,15 @@ export default {
     <div class="filter-sort-container">
       <div class="filter-container">
         <button class="filter-button" @click="showFilterSidebar = true"
-          :class="{ 'active-filter': this.selectedCategories.length > 0 }"
-          v-if="!showFilterSidebar && !showMobileSortPopup">
+          :class="{ 'active-filter': this.selectedCategory }" v-if="!showFilterSidebar && !showMobileSortPopup">
           <svg data-v-b856b8c9="" aria-hidden="true" focusable="false" role="presentation" class="filter-icon"
-            :class="{ 'active-filter-icon': this.selectedCategories.length > 0 }" viewBox="0 0 64 64">
+            :class="{ 'active-filter-icon': !this.selectedCategory }" viewBox="0 0 64 64">
             <title data-v-b856b8c9="">icon-filter</title>
             <path data-v-b856b8c9=""
               d="M48 42h10m-10 0a5 5 0 1 1-5-5 5 5 0 0 1 5 5ZM7 42h31M16 22H6m10 0a5 5 0 1 1 5 5 5 5 0 0 1-5-5Zm41 0H26">
             </path>
           </svg>
-          Filter{{ selectedCategories.length > 0 ? ` (${selectedCategories.length})` : '' }}
+          Filter
         </button>
       </div>
       <div class="sort-container">
@@ -284,8 +330,7 @@ export default {
             <ul class="mobile-sort-list">
               <li v-for="option in sortOptions" :key="option.value"
                 :class="{ 'selected-sort-option': selectedOptions === option.value }"
-                @click="selectedOptions = option.value; sortProducts(); showMobileSortPopup = false"
-                class="mobile-sort-item-name">
+                @click="selectedOptions = option.value; showMobileSortPopup = false; onSortChange()" class="mobile-sort-item-name">
                 {{ option.label }}
               </li>
             </ul>
@@ -293,18 +338,23 @@ export default {
         </div>
       </div>
     </div>
-    <div class="total-products">
-      <span>{{ this.products.length > 1 ? this.products.length +' products' : this.products.length + ' product' }}</span>
+    <div v-if="this.totalProducts > 0" class="total-products">
+      <span>{{ this.totalProducts > 1 ? this.totalProducts + ' products' : this.totalProducts + ' product'
+      }}</span>
     </div>
     <div v-if="showFilterSidebar" class="sidebar-overlay" @click="showFilterSidebar = false">
     </div>
     <div class="filter-sidebar" :class="{ open: showFilterSidebar }">
       <div class="sidebar-header">
         <span>Filter</span>
+        <button v-if="selectedCategory" @click="resetFilters" :class="{ 'isReset': selectedCategory }"
+          style="margin: 10px 0 10px 0;">
+          Reset
+        </button>
         <button class="close-button" @click="showFilterSidebar = false">&times;</button>
       </div>
       <div class="sidebar-content">
-        <div class="filter-item" style="border-top: none;" @click="getCategoriesList">
+        <div class="filter-item" @click="getCategoriesList">
           <button id="category">CATEGORY</button>
           <span class="svg-drop-down-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="12px" height="12px" viewBox="0 0 24 16" fill="none"
@@ -315,15 +365,16 @@ export default {
             </svg>
           </span>
         </div>
+
         <ul v-if="showCategories" class="category-list">
           <li v-for="cat in categories" :key="cat" class="filter-list-items">
             <label class="filter-label">
-              <input type="checkbox" class="input-checkbox" v-model="selectedCategories" @change="onCategoryChange"
+              <input type="radio" class="input-checkbox" v-model="selectedCategory" @change="onCategoryChange"
                 :value="cat" />
               <span class="checkmark">
                 <span class="checkmark-inner"></span>
               </span>
-              <span class="filter-name" :class="{ 'filter-name-selected': selectedCategories.includes(cat) }">{{ cat }}
+              <span class="filter-name" :class="{ 'filter-name-selected': selectedCategory === cat }">{{ cat }}
                 ({{ categoryCounts[cat] }})</span>
             </label>
           </li>
@@ -331,12 +382,13 @@ export default {
       </div>
     </div>
 
-    <div v-if="products.length > 0" class="main-content">
+    <div v-if="products && products.length > 0" class="main-content">
       <div class="left-content">
         <ul class="filter-list">
           <div class="filter-item" style="border-top: none;" @click="getCategoriesList">
             <button id="category">CATEGORY</button>
-            <button v-show="this.selectedCategories.length > 0" @click.stop="resetFilters" :class="{ 'isReset': this.selectedCategories.length > 0}">Reset All</button>
+            <button v-show="this.selectedCategory" @click.stop="resetFilters"
+              :class="{ 'isReset': this.selectedCategory }">Reset</button>
             <span class="svg-drop-down-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="12px" height="12px" viewBox="0 0 24 16" fill="none"
                 :class="{ 'rotated': showCategories }">
@@ -349,12 +401,12 @@ export default {
           <ul v-if="showCategories" class="category-list">
             <li v-for="cat in categories" :key="cat" class="filter-list-items">
               <label class="filter-label">
-                <input type="checkbox" class="input-checkbox" v-model="selectedCategories" @change="onCategoryChange"
+                <input type="radio" class="input-checkbox" v-model="selectedCategory" @change="onCategoryChange"
                   :value="cat" />
                 <span class="checkmark">
                   <span class="checkmark-inner"></span>
                 </span>
-                <span class="filter-name" :class="{ 'filter-name-selected': selectedCategories.includes(cat) }">{{ cat
+                <span class="filter-name" :class="{ 'filter-name-selected': selectedCategory === cat }">{{ cat
                   }} ({{ categoryCounts[cat] }})</span>
               </label>
             </li>
@@ -365,11 +417,11 @@ export default {
 
         <div class="top-right-container">
           <span v-if="searchQuery" class="products-count">
-            Showing {{ products.length }} {{ products.length === 1 ? 'result' : 'results' }} for "{{ searchQuery }}"
+            Showing {{ totalProducts }} {{ totalProducts === 1 ? 'result' : 'results' }} for "{{ searchQuery }}"
           </span>
           <span v-else class="products-count">{{ this.totalProducts }} products</span>
           <div class="sort-by-container">
-            <select id="sort-by" @change="sortProducts()" v-model="selectedOptions">
+            <select id="sort-by" @change="onSortChange" v-model="selectedOptions">
               <option value="default">Featured</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
@@ -378,27 +430,15 @@ export default {
             </select>
           </div>
         </div>
-        <!-- <ul class="images-list">
-          <li v-for="product in paginatedProducts" :key="product.id" class="images-list-items">
-            <a :href="product.thumbnail" target="_blank" id="product-thumbnail">
-              <div class="image-wrapper-class">
-                <img class="image-container-1" :src="product.images[0]" alt="">
-                <img v-if="product.images.length > 1" class="image-container-2" :src="product.images[1]" alt="">
-                <img v-else class="image-container-2" :src="product.images[0]" alt="">
-              </div>
-              <p class="product-title">{{ product.title }}</p>
-              <p class="product-price">{{ `$${product.price}` }}</p>
-            </a>
-          </li>
-        </ul> -->
-      <ProductCard :products="paginatedProducts"/>
+        <ProductCard :products="products" />
       </div>
     </div>
     <div v-else class="loading-container">
-      <p>No products found.</p>
+      <img src="../download_1.png" alt="No results found image" class="loading-image">
+      <div class="loading-message">{{ `No products found for "${searchQuery}"` }}</div>
     </div>
-    <div class="pagination" v-if="this.products.length > this.productsPerPage">
-      <div v-show="this.products.length > this.productsPerPage" v-for="page in pageCount" :key="page" class="page-item"
+    <div class="pagination" v-if="this.totalProducts > this.productsPerPage">
+      <div v-show="this.totalProducts > this.productsPerPage" v-for="page in pageCount" :key="page" class="page-item"
         @click="changePage(page)" :class="['page-item', { 'active-page': currentPage === page }]">
         {{ page }}
       </div>

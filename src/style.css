@@ -2,6 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "Mundo Sans";
 }
 
 .app-container {
@@ -86,6 +87,13 @@ select {
   padding-left: 20px;
 }
 
+.loading-message {
+  padding-top: 20px;
+  font-size: large;
+  font-weight: bold;
+  text-align: center;
+}
+
 .left-content {
   width: auto;
 }
@@ -108,7 +116,6 @@ select {
   justify-content: space-between;
   display: flex;
   width: 280px;
-  border-top: 1px solid;
   font-size: 0.8em;
   letter-spacing: 0.3em;
   padding-bottom: 10px;
@@ -307,6 +314,15 @@ input:checked ~ .checkmark .checkmark-inner {
   padding: 0;
 }
 
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 300px;
+  padding-left: 800px;
+}
+
 @media (max-width: 768px) {
   input {
     width: 100%;
@@ -414,13 +430,28 @@ input:checked ~ .checkmark .checkmark-inner {
     padding-bottom: 8px;
     stroke-width: 2px;
     margin-bottom: 4px;
-    fill: #ffffff;
-    stroke: black;
+    fill: #494949;
+    stroke: #ffffff;
   }
 
   .active-filter-icon {
-    fill: #494949 !important;
-    stroke: white;
+    fill: white !important;
+    stroke: #494949;
+  }
+
+  .isReset {
+    display: block;
+    font-weight: bold;
+    background-color: transparent;
+    border: none;
+    font-size: 0.8em;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: "mundo sans", sans-serif;
+    color: #494949;
+    text-transform: capitalize;
+    padding-left: 160px;
   }
 
   .total-products {
@@ -485,14 +516,6 @@ input:checked ~ .checkmark .checkmark-inner {
     margin-bottom: 16px;
   }
 
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 2em;
-    cursor: pointer;
-    line-height: 1;
-  }
-
   .sort-container {
     position: relative;
     margin-left: 15px;
@@ -504,8 +527,8 @@ input:checked ~ .checkmark .checkmark-inner {
   .close-button {
     background-color: white;
     border: none;
+    font-size: larger;
   }
-
   .sort-button {
     display: flex;
     align-items: center;
@@ -622,5 +645,20 @@ input:checked ~ .checkmark .checkmark-inner {
     color: #000;
     font-size: medium;
     font-family: "Mundo Sans";
+  }
+
+  .page-item {
+    padding: 0px 10px;
+  }
+
+  .loading-container {
+    padding-left: 0px;
+    padding-top: 10px;
+    font-family: "Mundo Sans";
+  }
+
+  .loading-image {
+    padding-top: 200px;
+    height: 300px;
   }
 }
