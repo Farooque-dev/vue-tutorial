@@ -342,6 +342,10 @@ input:checked ~ .checkmark .checkmark-inner {
     padding-right: 0;
   }
 
+  .sidebar-content {
+    border-bottom: 1px solid #494949;
+  }
+
   .filter-container {
     display: flex;
     width: 50%;
