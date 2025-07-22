@@ -1,11 +1,13 @@
 <script>
 import ProductCard from './ProductCard.vue';
+import debounce from 'debounce';
 export default {
   data() {
     return {
       products: [],
       originalProducts: [],
       searchQuery: '',
+      debouncedSearchFn: null,
       selectedOptions: 'default',
       totalProducts: 0,
       productsPerPage: 16,
@@ -39,7 +41,7 @@ export default {
         if (!this.selectedCategory && this.selectedOptions === 'default') {
           const response = await fetch(`https://dummyjson.com/products?limit=${this.productsPerPage}&skip=${skip}`);
 
-          if (!response) {
+          if (!response.ok) {
             throw new Error('No response found');
           }
 
@@ -54,7 +56,7 @@ export default {
           return this.products;
         } else {
           const response = await fetch(`https://dummyjson.com/products?limit=${this.productsPerPage}&skip=${skip}`);
-          if (!response) throw new Error('No response found');
+          if (!response.ok) throw new Error('No response found');
           const result = await response.json();
           this.products = result.products;
           this.totalProducts = result.total;
@@ -78,7 +80,7 @@ export default {
           this.selectedCategory = '';
           const skip = this.skipProducts(page);
           const response = await fetch(`https://dummyjson.com/products/search?q=${query}&limit=${this.productsPerPage}&skip=${skip}`);
-          if (!response) {
+          if (!response.ok) {
             throw new Error('No response found.');
           }
           const result = await response.json();
@@ -97,8 +99,6 @@ export default {
     },
 
     async sortProducts(category, skip, search) {
-      console.log(`category: ${category}`);
-      console.log(`query: ${search}`);
       this.currentPage = this.currentPage || 1;
       skip = skip !== undefined ? skip : this.skipProducts(this.currentPage);
 
@@ -126,11 +126,10 @@ export default {
       }
 
       const fullUrl = `${url}?${params.toString()}`;
-      console.log('Fetch URL:', fullUrl);
 
       try {
         const response = await fetch(fullUrl);
-        if (!response) throw new Error('No response found.');
+        if (!response.ok) throw new Error('No response found.');
         const result = await response.json();
         this.products = result.products;
         this.totalProducts = result.total;
@@ -148,13 +147,13 @@ export default {
     },
 
     returnToTop() {
-      this.isVisible = window.scrollY > 200;
+      this.isVisible = window.scrollY > 100;
     },
 
     async getCategoriesList() {
       try {
         const response = await fetch('https://dummyjson.com/products/category-list');
-        if (!response) {
+        if (!response.ok) {
           throw new Error('No response found.');
         }
         const result = await response.json();
@@ -166,7 +165,6 @@ export default {
           counts[cat] = total || 0;
         }));
         this.categoryCounts = counts;
-        console.log(counts);
       } catch (error) {
         console.error(error.message);
       }
@@ -175,7 +173,7 @@ export default {
     async fetchProductsByCategory(category, skip) {
       try {
         const response = await fetch(`https://dummyjson.com/products/category/${category}?limit=${this.productsPerPage}&skip=${skip}`);
-        if (!response) {
+        if (!response.ok) {
           throw new Error('No response found.');
         }
         return response;
@@ -187,7 +185,7 @@ export default {
     async getProductsByCategoryTotal(category) {
       try {
         const response = await this.fetchProductsByCategory(category, 0);
-        if (!response) {
+        if (!response.ok) {
           throw new Error('No response found.');
         }
         const result = await response.json();
@@ -207,12 +205,10 @@ export default {
       this.currentPage = page;
       this.scrollToTop();
       const skip = this.skipProducts(this.currentPage);
-      if (this.searchQuery) {
+      if (this.searchQuery || this.selectedOptions !== 'default') {
         await this.sortProducts(this.selectedCategory, skip, this.searchQuery);
       }
-      else if (this.selectedOptions !== 'default') {
-        await this.sortProducts(this.selectedCategory, skip, this.searchQuery);
-      } else if (this.selectedCategory) {
+      else if (this.selectedCategory) {
         await this.sortProducts(this.selectedCategory, skip)
       }
       else {
@@ -220,14 +216,6 @@ export default {
       }
     },
 
-    debouncedSearch(query) {
-      if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer);
-      }
-      this.debounceTimer = setTimeout(() => {
-        this.searchProducts(query);
-      }, 400);
-    },
     async resetFilters() {
       this.selectedCategory = '';
       this.currentPage = 1;
@@ -246,22 +234,29 @@ export default {
   mounted() {
     this.fetchData();
     window.addEventListener('scroll', this.returnToTop);
+    this.debouncedSearchFn = debounce(async (query) => {
+      await this.searchProducts(query);
+    }, 400);
   },
 
   watch: {
+    searchQuery(newQuery) {
+      this.debouncedSearchFn(newQuery);
+    },
+
     showFilterSidebar(val) {
       if (val) {
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('no-background-scroll');
       } else {
-        document.body.style.overflow = '';
+        document.body.classList.remove('no-background-scroll');
       }
     },
 
     showMobileSortPopup(val) {
       if (val) {
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('no-background-scroll');
       } else {
-        document.body.style.overflow = '';
+        document.body.classList.remove('no-background-scroll');
       }
     }
   },
@@ -293,28 +288,26 @@ export default {
   <div class="app-container">
     <div class="navbar-container">
       <div class="input-container">
-        <input type="text" v-model="searchQuery" @input="debouncedSearch(searchQuery)"
-          placeholder="Search for a product...">
+        <input type="text" v-model="searchQuery" placeholder="Search for a product...">
       </div>
 
     </div>
     <div class="filter-sort-container">
       <div class="filter-container">
-        <button class="filter-button" @click="showFilterSidebar = true"
+        <span class="filter-button" @click="showFilterSidebar = true"
           :class="{ 'active-filter': this.selectedCategory }" v-if="!showFilterSidebar && !showMobileSortPopup">
-          <svg data-v-b856b8c9="" aria-hidden="true" focusable="false" role="presentation" class="filter-icon"
+          <svg aria-hidden="true" focusable="false" role="presentation" class="filter-icon"
             :class="{ 'active-filter-icon': !this.selectedCategory }" viewBox="0 0 64 64">
-            <title data-v-b856b8c9="">icon-filter</title>
-            <path data-v-b856b8c9=""
+            <title>icon-filter</title>
+            <path
               d="M48 42h10m-10 0a5 5 0 1 1-5-5 5 5 0 0 1 5 5ZM7 42h31M16 22H6m10 0a5 5 0 1 1 5 5 5 5 0 0 1-5-5Zm41 0H26">
             </path>
           </svg>
           Filter
-        </button>
+        </span>
       </div>
       <div class="sort-container">
-        <button class="sort-button" @click="showSortDropdown = !showSortDropdown, showMobileSortPopup = true"
-          v-if="!showFilterSidebar && !showMobileSortPopup">
+        <div class="sort-button" @click="showMobileSortPopup = true" v-if="!showFilterSidebar && !showMobileSortPopup">
           <span class="sort-label-desktop">{{ sortLabel }}</span>
           <span class="sort-label-mobile">Sort By</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="20px" viewBox="0 0 28 24" class="sort-icon">
@@ -323,14 +316,15 @@ export default {
               <path d="M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z" fill="#494949" />
             </g>
           </svg>
-        </button>
+        </div>
         <div v-if="showMobileSortPopup" class="mobile-sort-popup-overlay" @click="showMobileSortPopup = false">
           <div class="mobile-sort-popup">
             <div class="mobile-sort-title">Sort By</div>
             <ul class="mobile-sort-list">
               <li v-for="option in sortOptions" :key="option.value"
                 :class="{ 'selected-sort-option': selectedOptions === option.value }"
-                @click="selectedOptions = option.value; showMobileSortPopup = false; onSortChange()" class="mobile-sort-item-name">
+                @click="selectedOptions = option.value; showMobileSortPopup = false; onSortChange()"
+                class="mobile-sort-item-name">
                 {{ option.label }}
               </li>
             </ul>
@@ -340,7 +334,7 @@ export default {
     </div>
     <div v-if="this.totalProducts > 0" class="total-products">
       <span>{{ this.totalProducts > 1 ? this.totalProducts + ' products' : this.totalProducts + ' product'
-      }}</span>
+        }}</span>
     </div>
     <div v-if="showFilterSidebar" class="sidebar-overlay" @click="showFilterSidebar = false">
     </div>
@@ -355,7 +349,7 @@ export default {
       </div>
       <div class="sidebar-content">
         <div class="filter-item" @click="getCategoriesList">
-          <button id="category">CATEGORY</button>
+          <span id="category">CATEGORY</span>
           <span class="svg-drop-down-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="14px" height="20px" viewBox="0 0 28 16" fill="none"
               :class="{ 'rotated': showCategories }">
@@ -386,7 +380,7 @@ export default {
       <div class="left-content">
         <ul class="filter-list">
           <div class="filter-item" style="border-top: none;" @click="getCategoriesList">
-            <button id="category">CATEGORY</button>
+            <span id="category">CATEGORY</span>
             <button v-show="this.selectedCategory" @click.stop="resetFilters"
               :class="{ 'isReset': this.selectedCategory }">Reset</button>
             <span class="svg-drop-down-icon">
@@ -407,7 +401,7 @@ export default {
                   <span class="checkmark-inner"></span>
                 </span>
                 <span class="filter-name" :class="{ 'filter-name-selected': selectedCategory === cat }">{{ cat
-                  }} ({{ categoryCounts[cat] }})</span>
+                }} ({{ categoryCounts[cat] }})</span>
               </label>
             </li>
           </ul>
@@ -444,7 +438,16 @@ export default {
       </div>
     </div>
     <div class="scroll-to-top" v-show="isVisible">
-      <button class="scroll-to-top" @click="scrollToTop()">Scroll to Top</button>
+      <button class="scroll-to-top-btn" @click="scrollToTop()"><svg xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" height="20px" width="20px" version="1.1"
+          id="Layer_1" viewBox="0 0 511.735 511.735" xml:space="preserve">
+          <g>
+            <g>
+              <path
+                d="M508.788,371.087L263.455,125.753c-4.16-4.16-10.88-4.16-15.04,0L2.975,371.087c-4.053,4.267-3.947,10.987,0.213,15.04    c4.16,3.947,10.667,3.947,14.827,0l237.867-237.76l237.76,237.76c4.267,4.053,10.987,3.947,15.04-0.213    C512.734,381.753,512.734,375.247,508.788,371.087z" />
+            </g>
+          </g>
+        </svg></button>
     </div>
   </div>
 </template>

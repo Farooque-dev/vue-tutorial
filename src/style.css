@@ -6,14 +6,12 @@
 }
 
 .app-container {
-  padding-left: 89px;
-  padding-bottom: 902px;
+  padding-bottom: 1em;
 }
 
 .navbar-container {
   display: flex;
-  padding: 10px;
-  justify-content: space-between;
+  padding: 10px 0;
 }
 
 input {
@@ -66,9 +64,10 @@ select {
 .images-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
   list-style: none;
   width: 100%;
+  gap: 20px;
+  padding-top: 10px;
 }
 
 .logo {
@@ -79,12 +78,8 @@ select {
 .main-content {
   margin-top: 50px;
   display: flex;
-  padding-left: 13px;
-}
-
-.loading-container {
-  margin-top: 0;
-  padding-left: 20px;
+  padding-bottom: 30px;
+  line-height: normal;
 }
 
 .loading-message {
@@ -100,6 +95,7 @@ select {
 
 .right-content {
   padding-left: 20px;
+  width: 100%;
 }
 
 .filter-list {
@@ -114,12 +110,14 @@ select {
 
 .filter-item {
   justify-content: space-between;
+  align-items: flex-end;
   display: flex;
   width: 280px;
   font-size: 0.8em;
   letter-spacing: 0.3em;
   padding-bottom: 10px;
   cursor: pointer;
+  padding-top: 18px;
 }
 
 .filter-sort-container {
@@ -127,10 +125,12 @@ select {
 }
 
 #app {
-  padding-bottom: 100px;
-  padding-left: 17px;
-  padding-right: 17px;
-  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 10%;
+  display: block;
+  width: 100%;
+  max-width: 1550px;
 }
 
 .total-products {
@@ -199,27 +199,23 @@ select {
 .top-right-container {
   display: flex;
   justify-content: space-between;
-  width: 1400px;
+  width: 100%;
+  align-items: flex-end;
 }
 
 .sort-by-container {
   background-color: white;
-  padding-right: 272px;
 }
 
 #sort-by {
   background-color: white;
   border: 1px solid black;
   border-radius: 0;
-  height: 44px;
-  width: 249.16px;
+  height: 100%;
+  width: 100%;
   font-family: "Mundo Sans";
   font-size: medium;
   cursor: pointer;
-}
-
-.products-count {
-  margin-bottom: 15px;
 }
 
 .product-title,
@@ -227,7 +223,7 @@ select {
   text-align: center;
   font-family: Space Mono;
   line-height: 1.5;
-  letter-spacing: 0.025em;
+  letter-spacing: normal;
   color: #494949;
 }
 
@@ -238,7 +234,6 @@ select {
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 100px;
   cursor: pointer;
   flex-wrap: wrap;
 }
@@ -298,16 +293,24 @@ input:checked ~ .checkmark .checkmark-inner {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 1000;
   width: 60px;
   height: 60px;
   color: black;
   background-color: white;
   border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  opacity: 0.5;
+  opacity: 1;
   transition: opacity 0.3s ease;
   cursor: pointer;
+}
+
+.scroll-to-top-btn {
+  border: none;
+  background-color: grey;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: grey;
+  border-radius: 50%;
 }
 
 #product-thumbnail {
@@ -320,11 +323,12 @@ input:checked ~ .checkmark .checkmark-inner {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 300px;
-  padding-left: 800px;
 }
 
 @media (max-width: 768px) {
+  #app {
+    position: unset;
+  }
   input {
     width: 100%;
   }
@@ -358,9 +362,15 @@ input:checked ~ .checkmark .checkmark-inner {
 
   .sort-label-mobile {
     display: inline;
+    font-family: "Mundo Sans", sans-serif;
+    color: #494949;
   }
   .sort-label-desktop {
     display: none;
+  }
+
+  .no-background-scroll {
+    overflow: hidden;
   }
 
   .mobile-sort-popup-overlay {
@@ -370,7 +380,6 @@ input:checked ~ .checkmark .checkmark-inner {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -436,11 +445,11 @@ input:checked ~ .checkmark .checkmark-inner {
   .filter-icon {
     margin-left: 18px;
     margin-right: 10px;
-    padding-bottom: 8px;
     stroke-width: 2px;
     margin-bottom: 4px;
     fill: #494949;
     stroke: #ffffff;
+    width: 20px;
   }
 
   .active-filter-icon {
@@ -474,7 +483,8 @@ input:checked ~ .checkmark .checkmark-inner {
   .filter-button {
     text-align: left;
     display: flex;
-    justify-content: center;
+    justify-content: left;
+    align-items: center;
     width: 100%;
     height: 44px;
     background-color: white;
@@ -483,8 +493,6 @@ input:checked ~ .checkmark .checkmark-inner {
     font-size: 16px;
     letter-spacing: normal;
     font-family: "Mundo Sans", sans-serif;
-    padding-top: 12px;
-    padding-right: 70px;
   }
 
   .sidebar-overlay {
@@ -494,7 +502,6 @@ input:checked ~ .checkmark .checkmark-inner {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.3);
-    z-index: 999;
   }
 
   .filter-sidebar {
@@ -506,10 +513,10 @@ input:checked ~ .checkmark .checkmark-inner {
     height: 100%;
     background: #fff;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 24px 16px 16px 16px;
     overflow-y: auto;
+    z-index: 1;
   }
 
   .filter-sidebar.open {
@@ -647,7 +654,19 @@ input:checked ~ .checkmark .checkmark-inner {
   }
 
   .scroll-to-top {
-    display: none;
+    opacity: 1;
+    height: 40px;
+    width: 40px;
+  }
+
+  .scroll-to-top-btn {
+    border: none;
+    background-color: grey;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    box-shadow: grey;
+    border-radius: 50%;
   }
 
   .sort-dropdown ul li {
