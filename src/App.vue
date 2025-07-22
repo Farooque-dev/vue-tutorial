@@ -69,25 +69,26 @@ export default {
     },
 
     async searchProducts(query, page = 1) {
-
       if (!query) {
         this.currentPage = 1;
         await this.fetchData();
         return;
       } else {
-        try {
-          this.selectedOptions = 'default';
-          this.selectedCategory = '';
-          const skip = this.skipProducts(page);
-          const response = await fetch(`https://dummyjson.com/products/search?q=${query}&limit=${this.productsPerPage}&skip=${skip}`);
-          if (!response.ok) {
-            throw new Error('No response found.');
+        if (query.trim().length !== 0) {
+          try {
+            this.selectedOptions = 'default';
+            this.selectedCategory = '';
+            const skip = this.skipProducts(page);
+            const response = await fetch(`https://dummyjson.com/products/search?q=${query}&limit=${this.productsPerPage}&skip=${skip}`);
+            if (!response.ok) {
+              throw new Error('No response found.');
+            }
+            const result = await response.json();
+            this.products = result.products;
+            this.totalProducts = result.total;
+          } catch (error) {
+            console.error(error.message);
           }
-          const result = await response.json();
-          this.products = result.products;
-          this.totalProducts = result.total;
-        } catch (error) {
-          console.error(error.message);
         }
       }
     },
@@ -292,7 +293,7 @@ export default {
       </div>
 
     </div>
-    <div class="filter-sort-container">
+    <div class="filter-sort-container hidden-desktop">
       <div class="filter-container">
         <span class="filter-button" @click="showFilterSidebar = true"
           :class="{ 'active-filter': this.selectedCategory }" v-if="!showFilterSidebar && !showMobileSortPopup">
@@ -306,7 +307,7 @@ export default {
           Filter
         </span>
       </div>
-      <div class="sort-container">
+      <div class="sort-container hidden-desktop">
         <div class="sort-button" @click="showMobileSortPopup = true" v-if="!showFilterSidebar && !showMobileSortPopup">
           <span class="sort-label-desktop">{{ sortLabel }}</span>
           <span class="sort-label-mobile">Sort By</span>
@@ -332,13 +333,13 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="this.totalProducts > 0" class="total-products">
+    <div v-if="this.totalProducts > 0" class="total-products hidden-desktop">
       <span>{{ this.totalProducts > 1 ? this.totalProducts + ' products' : this.totalProducts + ' product'
-        }}</span>
+      }}</span>
     </div>
-    <div v-if="showFilterSidebar" class="sidebar-overlay" @click="showFilterSidebar = false">
+    <div v-if="showFilterSidebar" class="sidebar-overlay hidden-desktop" @click="showFilterSidebar = false">
     </div>
-    <div class="filter-sidebar" :class="{ open: showFilterSidebar }">
+    <div class="filter-sidebar hidden-desktop" :class="{ open: showFilterSidebar }">
       <div class="sidebar-header">
         <span>Filter</span>
         <button v-if="selectedCategory" @click="resetFilters" :class="{ 'isReset': selectedCategory }"
@@ -377,7 +378,7 @@ export default {
     </div>
 
     <div v-if="products && products.length > 0" class="main-content">
-      <div class="left-content">
+      <div class="left-content mobile-hidden">
         <ul class="filter-list">
           <div class="filter-item" style="border-top: none;" @click="getCategoriesList">
             <span id="category">CATEGORY</span>
@@ -401,7 +402,7 @@ export default {
                   <span class="checkmark-inner"></span>
                 </span>
                 <span class="filter-name" :class="{ 'filter-name-selected': selectedCategory === cat }">{{ cat
-                }} ({{ categoryCounts[cat] }})</span>
+                  }} ({{ categoryCounts[cat] }})</span>
               </label>
             </li>
           </ul>
@@ -409,7 +410,7 @@ export default {
       </div>
       <div class="right-content">
 
-        <div class="top-right-container">
+        <div class="top-right-container mobile-hidden">
           <span v-if="searchQuery" class="products-count">
             Showing {{ totalProducts }} {{ totalProducts === 1 ? 'result' : 'results' }} for "{{ searchQuery }}"
           </span>
@@ -425,18 +426,19 @@ export default {
           </div>
         </div>
         <ProductCard :products="products" />
+        <div class="pagination" v-if="this.totalProducts > this.productsPerPage">
+          <div v-show="this.totalProducts > this.productsPerPage" v-for="page in pageCount" :key="page"
+            class="page-item" @click="changePage(page)" :class="['page-item', { 'active-page': currentPage === page }]">
+            {{ page }}
+          </div>
+        </div>
       </div>
     </div>
     <div v-else class="loading-container">
       <img src="../download_1.png" alt="No results found image" class="loading-image">
       <div class="loading-message">{{ `No products found for "${searchQuery}"` }}</div>
     </div>
-    <div class="pagination" v-if="this.totalProducts > this.productsPerPage">
-      <div v-show="this.totalProducts > this.productsPerPage" v-for="page in pageCount" :key="page" class="page-item"
-        @click="changePage(page)" :class="['page-item', { 'active-page': currentPage === page }]">
-        {{ page }}
-      </div>
-    </div>
+
     <div class="scroll-to-top" v-show="isVisible">
       <button class="scroll-to-top-btn" @click="scrollToTop()"><svg xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" height="20px" width="20px" version="1.1"
