@@ -446,7 +446,6 @@ input:checked ~ .checkmark .checkmark-inner {
     margin-left: 18px;
     margin-right: 10px;
     stroke-width: 2px;
-    margin-bottom: 4px;
     fill: #494949;
     stroke: #ffffff;
     width: 20px;
