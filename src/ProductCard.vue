@@ -14,12 +14,13 @@ export default {
             <a :href="product.thumbnail" target="_blank" id="product-thumbnail">
                 <div class="image-wrapper-class">
                     <img class="image-container-1" :src="product.images[0]" :alt="product.title">
-                    <img v-if="product.images.length > 1" class="image-container-2" :src="product.images[1]" :alt="product.title">
+                    <img v-if="product.images.length > 1" class="image-container-2" :src="product.images[1]"
+                        :alt="product.title">
                     <img v-else class="image-container-2" :src="product.images[0]" :alt="product.title">
                 </div>
-                <p class="product-title">{{ product.title }}</p>
-                <p class="product-price">{{ `$${product.price}` }}</p>
             </a>
+            <p class="product-title">{{ product.title }}</p>
+            <p class="product-price">{{ `$${product.price}` }}</p>
         </li>
     </ul>
 </template>
