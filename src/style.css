@@ -85,7 +85,6 @@ select {
 .main-content {
   margin-top: 50px;
   display: flex;
-  padding-bottom: 30px;
   line-height: normal;
 }
 
