@@ -485,7 +485,12 @@ input:checked ~ .checkmark .checkmark-inner {
     font-family: "Mundo Sans", sans-serif;
   }
 
+  .filter-item {
+    width: 100%;
+  }
+
   .sidebar-overlay {
+    display: inline;
     position: fixed;
     top: 0;
     left: 0;
@@ -498,8 +503,8 @@ input:checked ~ .checkmark .checkmark-inner {
     display: block;
     position: fixed;
     top: 0;
-    left: -320px;
-    width: 300px;
+    left: -620px;
+    width: 80%;
     height: 100%;
     background: #fff;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
